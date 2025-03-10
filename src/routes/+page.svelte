@@ -106,17 +106,60 @@
         fetchLogs(logs.length)
     }, 1000)
 
-    return () => clearInterval(interval)
+    let pressedButtons: string[] = []
+
+    const handle = (event: Event, buttons: string[], action: () => void) => {
+      if (buttons.every(button => pressedButtons.includes(button))) {
+        event.preventDefault()
+        action()
+      }
+    }
+
+    const keydownHandler = (event: KeyboardEvent) => {
+      if (!pressedButtons.includes(event.code))
+        pressedButtons = [ ...pressedButtons, event.code ]
+      handle(event, [ "AltRight", "Digit1" ], () => { selectedLogLevel = "trace" })
+      handle(event, [ "AltLeft", "Digit1" ], () => { selectedLogLevel = "trace" })
+      handle(event, [ "AltRight", "Digit2" ], () => { selectedLogLevel = "debug" })
+      handle(event, [ "AltLeft", "Digit2" ], () => { selectedLogLevel = "debug" })
+      handle(event, [ "AltRight", "Digit3" ], () => { selectedLogLevel = "info" })
+      handle(event, [ "AltLeft", "Digit3" ], () => { selectedLogLevel = "info" })
+      handle(event, [ "AltRight", "Digit4" ], () => { selectedLogLevel = "warn" })
+      handle(event, [ "AltLeft", "Digit4" ], () => { selectedLogLevel = "warn" })
+      handle(event, [ "AltRight", "Digit5" ], () => { selectedLogLevel = "error" })
+      handle(event, [ "AltLeft", "Digit5" ], () => { selectedLogLevel = "error" })
+      handle(event, [ "AltRight", "Digit6" ], () => { selectedLogLevel = "fatal" })
+      handle(event, [ "AltLeft", "Digit6" ], () => { selectedLogLevel = "fatal" })
+      handle(event, [ "AltRight", "KeyR" ], () => { reset() })
+      handle(event, [ "AltLeft", "KeyR" ], () => { reset() })
+      handle(event, [ "AltRight", "KeyS" ], () => { tail = !tail })
+      handle(event, [ "AltLeft", "KeyS" ], () => { tail = !tail })
+      handle(event, [ "AltRight", "KeyF" ], () => { document.getElementById('filter')?.focus() })
+      handle(event, [ "AltLeft", "KeyF" ], () => { document.getElementById('filter')?.focus() })
+    }
+    
+    const keyupHandler = (event: KeyboardEvent) => {
+      pressedButtons = pressedButtons.filter(k => k !== event.code)
+    }
+
+    document.body.addEventListener('keydown', keydownHandler)
+    document.body.addEventListener('keyup', keyupHandler)
+
+    return () => {
+      clearInterval(interval)
+      document.body.removeEventListener('keydown', keydownHandler)
+      document.body.removeEventListener('keyup', keyupHandler)
+    }
   })
 </script>
 
 <main>
   <div class="flex items-center p-3 bg-accent-content justify-between">
     <div class="flex gap-2">
-      <button class="btn btn-error" aria-label="clear" onclick={deleteLogs}>
+      <!-- <button class="btn btn-error" aria-label="clear" onclick={deleteLogs}>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M17 5V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v1H4a1 1 0 0 0 0 2h1v11a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V7h1a1 1 0 1 0 0-2zm-2-1H9v1h6zm2 3H7v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z" clip-rule="evenodd"/><path d="M9 9h2v8H9zm4 0h2v8h-2z"/></g></svg>
-      </button>
-      <button class="btn btn-info" aria-label="refresh" onclick={reset}>
+      </button> -->
+      <button class="btn btn-info" aria-label="refresh" onclick={deleteLogs}>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"/></svg>
       </button>
       {#if tail}
@@ -136,7 +179,7 @@
       {/if}
     </div>
 
-    <input class="input" type="text" bind:value={tagFilter} placeholder="Filter by tags">
+    <input id="filter" class="input" type="text" bind:value={tagFilter} placeholder="Filter by tags">
 
     <div class="flex">
       {#each logLevels as logLevel}
