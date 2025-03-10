@@ -1,0 +1,7 @@
+{"level":"fatal","tags": ["valami"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":"error","tags": ["mas"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":"info","tags": ["masvalami"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":"debug","tags": ["valami","mas"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":"trace","tags": ["akarmi"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":"warn","tags": ["barmi"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":"info","tags": ["csakaz"],"time":1741243451931,"pid":30869,"hostname":"Balints-MacBook-Air.local","msg":"start up"}

@@ -1,0 +1,16 @@
+{"level":30,"time":1741530888834,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Logger middleware registered\"}"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Stateful auth middleware added\"}"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"[ts-rest] Initialized POST /auth/api/login"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"[ts-rest] Initialized GET /auth/api/check"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"[ts-rest] Initialized POST /auth/api/logout"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"[ts-rest] Initialized GET /api/ping"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"[ts-rest] Initialized POST /api/image"}
+{"level":30,"time":1741530888835,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"[ts-rest] Initialized DELETE /api/image/:id"}
+{"level":30,"time":1741530888837,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Server started\"}"}
+{"level":30,"time":1741530888840,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Redis connection establised\"}"}
+{"level":30,"time":1741530888844,"pid":49374,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Redis ready\"}"}
+{"level":30,"time":1741532884657,"pid":69044,"hostname":"Balints-MacBook-Air.local","msg":"start up"}
+{"level":50,"tags":["error","typo"],"time":1741532884657,"pid":69044,"hostname":"Balints-MacBook-Air.local","err":{"type":"ReferenceError","message":"d is not defined","stack":"ReferenceError: d is not defined\n    at <anonymous> (/Users/balinttoth/Development/Boilerplate/monorepo/executables/apis/admin-api/src/index.ts:37:11111111ajdhfjkdashfdjkshfajsdkhfjkdsahfjkasdhfjksadhfjkasdhfjksadhfjkds)\n    at ModuleJob.run (node:internal/modules/esm/module_job:273:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:600:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:98:5)"},"msg":"d is not defined"}
+{"level":30,"time":1741532884660,"pid":69044,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Redis connection establised\"}"}
+{"level":30,"time":1741532884669,"pid":69044,"hostname":"Balints-MacBook-Air.local","msg":"🟢 --> {\"message\":\"Redis ready\"}"}
