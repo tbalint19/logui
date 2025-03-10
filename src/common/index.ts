@@ -9,7 +9,7 @@ let _isBlocking = false
 let _logfilename = "app"
 let _lines: unknown[] = []
 
-export const logdir = () => `${__dirname}/../../volume`
+export const logdir = () => process.env.NODE_ENV === "development" ? `${__dirname}/../../volume` : `./volume`
 export const logfile = (name?: string) => `${__dirname}/../../volume/${name || _logfilename}.log`
 export const selectLogfile = (name: string) => _logfilename = name
 
@@ -42,6 +42,7 @@ export const safeExec = (
       unblock()
       return { done: true }
     } catch (error) {
+      console.log(error)
       unblock()
       return { done: false }
     }

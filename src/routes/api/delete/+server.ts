@@ -4,7 +4,6 @@ import { safeExec, logfile, reset } from "../../../common"
 
 export const GET = async () => {
   const result = await safeExec(() => {
-    console.log("runs")
     fs.writeFileSync(logfile(), "")
     reset()
   })
