@@ -9,8 +9,8 @@ let _isBlocking = false
 let _logfilename = "app"
 let _lines: unknown[] = []
 
-export const logdir = () => process.env.NODE_ENV === "development" ? `${__dirname}/../../volume` : `./volume`
-export const logfile = (name?: string) => `${__dirname}/../../volume/${name || _logfilename}.log`
+export const logdir = () => `${process.argv[2]}`
+export const logfile = (name?: string) => `${process.argv[2]}`  === 'dev' ? './volume/app.log' : `${process.argv[2]}`
 export const selectLogfile = (name: string) => _logfilename = name
 
 export const lines = () => _lines

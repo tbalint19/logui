@@ -11,7 +11,22 @@ const read = async () => {
     } catch (error) {
       lines.push({ level: "trace", msg: "invalid log"})
     }
-  updateLines(lines)
+  const ordered: unknown[] = []
+  for (let index = 0; index < lines.length; index++) {
+    const log = lines[index] as any
+    if (index === 0) {
+      if (!log.time) {
+        log.time = 0
+      }
+      ordered.push(log)
+      continue
+    }
+    const previousLog = lines[index-1] as any
+    if (!log.time || +log.time <= previousLog.time)
+      log.time = previousLog.time + 1
+    ordered.push(log)
+  }
+  updateLines(ordered)
 }
 
 setInterval(() => safeExec(read, { count: 1, seconds: 0 }), 1000)

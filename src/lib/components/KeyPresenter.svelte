@@ -27,7 +27,7 @@
 
 <div class="pl-3">
   {#if keys}
-    {#each keys as key}
+    {#each keys as key, i (key + i)}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="flex justify-between py-1 my-1 hover:bg-accent/50 cursor-pointer" onclick={() => opened = opened.includes(key) ? opened.filter(k => k !== key) : [ ...opened, key ]}>

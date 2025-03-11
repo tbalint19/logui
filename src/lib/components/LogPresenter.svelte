@@ -1,6 +1,7 @@
 <script lang="ts">
   import { slide } from "svelte/transition";
   import KeyPresenter from "./KeyPresenter.svelte";
+  import { onMount } from "svelte";
 
   type JSONStringifiable =
     | string
@@ -55,6 +56,36 @@
   }
 
   let isOpen = $state(false)
+
+  onMount(() => {
+    let pressedButtons: string[] = []
+
+    const handle = (event: Event, buttons: string[], action: () => void) => {
+      if (buttons.every(button => pressedButtons.includes(button))) {
+        event.preventDefault()
+        action()
+      }
+    }
+
+    const keydownHandler = (event: KeyboardEvent) => {
+      if (!pressedButtons.includes(event.code))
+        pressedButtons = [ ...pressedButtons, event.code ]
+      handle(event, [ "AltRight", "KeyC" ], () => { isOpen = false })
+      handle(event, [ "AltLeft", "KeyC" ], () => { isOpen = false })
+    }
+    
+    const keyupHandler = (event: KeyboardEvent) => {
+      pressedButtons = pressedButtons.filter(k => k !== event.code)
+    }
+
+    document.body.addEventListener('keydown', keydownHandler)
+    document.body.addEventListener('keyup', keyupHandler)
+
+    return () => {
+      document.body.removeEventListener('keydown', keydownHandler)
+      document.body.removeEventListener('keyup', keyupHandler)
+    }
+  })
 </script>
 
 <section class="p-1 bg-accent-content m-2">

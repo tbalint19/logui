@@ -24,14 +24,20 @@
   ] as const
 
   let selectedLogLevel = $state<LogLevel>("trace")
+  let strictLevel = $state(false)
   let tagFilter = $state("")
   let logs = $state<Log[]>([])
   let tail = $state(true)
 
   let presentedLogs = $derived([ ...logs ].slice(-500).reverse().filter(log => {
 
-    if (logLevels.indexOf(log.level) < logLevels.indexOf(selectedLogLevel))
-      return false
+    if (strictLevel) {
+      if (logLevels.indexOf(log.level) !== logLevels.indexOf(selectedLogLevel))
+        return false
+    } else {
+      if (logLevels.indexOf(log.level) < logLevels.indexOf(selectedLogLevel))
+        return false
+    }
 
     if (tagFilter && !tagFilter.split(",").map(tag => tag.trim()).every(tag => log.tags && log.tags.some(t => t.match(new RegExp(tag)))))
       return false
@@ -86,16 +92,10 @@
     }
   }
 
-  const formatDate = (num: number) => {
-    const pad = (n: number) => `${n}`.length === 1 ? `0${n}` : `${n}`
-    const date = new Date(num)
-    return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
-  }
-
-  const formatLog = (log: Log) => {
-    const { tags, msg } = log
-    const content = JSON.stringify({ tags, msg })
-    return content.length < 100 ? content : content.slice(0, 100) + "..."
+  const selectLevel = (level: LogLevel) => {
+    if (selectedLogLevel === level)
+      strictLevel = !strictLevel
+    selectedLogLevel = level
   }
 
   onMount(() => {
@@ -118,18 +118,18 @@
     const keydownHandler = (event: KeyboardEvent) => {
       if (!pressedButtons.includes(event.code))
         pressedButtons = [ ...pressedButtons, event.code ]
-      handle(event, [ "AltRight", "Digit1" ], () => { selectedLogLevel = "trace" })
-      handle(event, [ "AltLeft", "Digit1" ], () => { selectedLogLevel = "trace" })
-      handle(event, [ "AltRight", "Digit2" ], () => { selectedLogLevel = "debug" })
-      handle(event, [ "AltLeft", "Digit2" ], () => { selectedLogLevel = "debug" })
-      handle(event, [ "AltRight", "Digit3" ], () => { selectedLogLevel = "info" })
-      handle(event, [ "AltLeft", "Digit3" ], () => { selectedLogLevel = "info" })
-      handle(event, [ "AltRight", "Digit4" ], () => { selectedLogLevel = "warn" })
-      handle(event, [ "AltLeft", "Digit4" ], () => { selectedLogLevel = "warn" })
-      handle(event, [ "AltRight", "Digit5" ], () => { selectedLogLevel = "error" })
-      handle(event, [ "AltLeft", "Digit5" ], () => { selectedLogLevel = "error" })
-      handle(event, [ "AltRight", "Digit6" ], () => { selectedLogLevel = "fatal" })
-      handle(event, [ "AltLeft", "Digit6" ], () => { selectedLogLevel = "fatal" })
+      handle(event, [ "AltRight", "Digit1" ], () => { selectLevel("trace") })
+      handle(event, [ "AltLeft", "Digit1" ], () => { selectLevel("trace") })
+      handle(event, [ "AltRight", "Digit2" ], () => { selectLevel("debug") })
+      handle(event, [ "AltLeft", "Digit2" ], () => { selectLevel("debug") })
+      handle(event, [ "AltRight", "Digit3" ], () => { selectLevel("info") })
+      handle(event, [ "AltLeft", "Digit3" ], () => { selectLevel("info") })
+      handle(event, [ "AltRight", "Digit4" ], () => { selectLevel("warn") })
+      handle(event, [ "AltLeft", "Digit4" ], () => { selectLevel("warn") })
+      handle(event, [ "AltRight", "Digit5" ], () => { selectLevel("error") })
+      handle(event, [ "AltLeft", "Digit5" ], () => { selectLevel("error") })
+      handle(event, [ "AltRight", "Digit6" ], () => { selectLevel("fatal") })
+      handle(event, [ "AltLeft", "Digit6" ], () => { selectLevel("fatal") })
       handle(event, [ "AltRight", "KeyR" ], () => { deleteLogs() })
       handle(event, [ "AltLeft", "KeyR" ], () => { deleteLogs() })
       handle(event, [ "AltRight", "KeyS" ], () => { tail = !tail })
@@ -182,13 +182,13 @@
     <input id="filter" class="input" type="text" bind:value={tagFilter} placeholder="Filter by tags">
 
     <div class="flex">
-      {#each logLevels as logLevel}
+      {#each logLevels as logLevel (logLevel)}
       <button onclick={() => selectedLogLevel = logLevel} class={`btn ${getColor(logLevel)} ${selectedLogLevel === logLevel ? 'border-2 border-neutral-content' : 'border-2'}`}>{ logLevel }</button>
       {/each}
     </div>
   </div>
 
-  {#each presentedLogs as log}
+  {#each presentedLogs as log (log.time)}
     <LogPresenter log={log}></LogPresenter>
   {/each}
 </main>

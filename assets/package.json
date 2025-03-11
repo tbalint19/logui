@@ -1,0 +1,7 @@
+{
+  "name": "pinoviewer",
+  "version": "0.0.19",
+  "bin": {
+    "pinoviewer": "./index.js"
+  }
+}
