@@ -24,18 +24,23 @@
   ] as const
 
   let selectedLogLevel = $state<LogLevel>("trace")
-  let strictLevel = $state(false)
+  let levelFilterMode = $state<"strict" | "upwards" | "downwards">("upwards")
   let tagFilter = $state("")
   let logs = $state<Log[]>([])
   let tail = $state(true)
 
-  let presentedLogs = $derived([ ...logs ].slice(-500).reverse().filter(log => {
+  let presentedLogs = $derived([ ...logs ].reverse().filter(log => {
 
-    if (strictLevel) {
+    if (levelFilterMode === "strict") {
       if (logLevels.indexOf(log.level) !== logLevels.indexOf(selectedLogLevel))
         return false
-    } else {
+    }
+    if (levelFilterMode === "upwards") {
       if (logLevels.indexOf(log.level) < logLevels.indexOf(selectedLogLevel))
+        return false
+    }
+    if (levelFilterMode === "downwards") {
+      if (logLevels.indexOf(log.level) > logLevels.indexOf(selectedLogLevel))
         return false
     }
 
@@ -92,9 +97,26 @@
     }
   }
 
+  const getBorder = (logLevel: LogLevel) => {
+    if (levelFilterMode === "strict") {
+      if (logLevels.indexOf(logLevel) !== logLevels.indexOf(selectedLogLevel))
+        return 'border-2'
+    }
+    if (levelFilterMode === "upwards") {
+      if (logLevels.indexOf(logLevel) < logLevels.indexOf(selectedLogLevel))
+        return 'border-2'
+    }
+    if (levelFilterMode === "downwards") {
+      if (logLevels.indexOf(logLevel) > logLevels.indexOf(selectedLogLevel))
+        return 'border-2'
+    }
+    return 'border-2 border-neutral-content'
+  }
+
   const selectLevel = (level: LogLevel) => {
-    if (selectedLogLevel === level)
-      strictLevel = !strictLevel
+    if (selectedLogLevel !== level) {
+      levelFilterMode = "upwards"
+    }
     selectedLogLevel = level
   }
 
@@ -136,6 +158,14 @@
       handle(event, [ "AltLeft", "KeyS" ], () => { tail = !tail })
       handle(event, [ "AltRight", "KeyF" ], () => { document.getElementById('filter')?.focus() })
       handle(event, [ "AltLeft", "KeyF" ], () => { document.getElementById('filter')?.focus() })
+      handle(event, [ "AltRight", "ArrowRight" ], () => { levelFilterMode = "upwards" })
+      handle(event, [ "AltLeft", "ArrowRight" ], () => { levelFilterMode = "upwards" })
+      handle(event, [ "AltRight", "ArrowLeft" ], () => { levelFilterMode = "downwards" })
+      handle(event, [ "AltLeft", "ArrowLeft" ], () => { levelFilterMode = "downwards" })
+      handle(event, [ "AltRight", "ArrowUp" ], () => { levelFilterMode = "strict" })
+      handle(event, [ "AltLeft", "ArrowUp" ], () => { levelFilterMode = "strict" })
+      handle(event, [ "AltRight", "ArrowDown" ], () => { levelFilterMode = "strict" })
+      handle(event, [ "AltLeft", "ArrowDown" ], () => { levelFilterMode = "strict" })
     }
     
     const keyupHandler = (event: KeyboardEvent) => {
@@ -181,9 +211,9 @@
 
     <input id="filter" class="input" type="text" bind:value={tagFilter} placeholder="Filter by tags">
 
-    <div class="flex">
+    <div class="flex gap-2">
       {#each logLevels as logLevel (logLevel)}
-      <button onclick={() => selectedLogLevel = logLevel} class={`btn ${getColor(logLevel)} ${selectedLogLevel === logLevel ? 'border-2 border-neutral-content' : 'border-2'}`}>{ logLevel }</button>
+      <button onclick={() => selectedLogLevel = logLevel} class={`btn ${getColor(logLevel)} ${getBorder(logLevel)}`}>{ logLevel }</button>
       {/each}
     </div>
   </div>
