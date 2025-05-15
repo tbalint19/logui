@@ -1,12 +1,8 @@
 import { json } from "@sveltejs/kit"
-import * as fs from "fs"
-import { safeExec, logfile, reset } from "../../../common"
+import { reset } from "../../../common/reader"
 
 export const GET = async () => {
-  const result = await safeExec(() => {
-    fs.writeFileSync(logfile(), "")
-    reset()
-  })
+  const result = await reset()
 
   return json(result)
 }

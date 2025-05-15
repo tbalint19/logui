@@ -1,7 +1,7 @@
 {
   "name": "pinoviewer",
   "type": "module",
-  "version": "0.0.32",
+  "version": "0.0.47",
   "bin": {
     "pinoviewer": "./index.js"
   }

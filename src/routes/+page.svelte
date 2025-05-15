@@ -29,6 +29,22 @@
   let logs = $state<Log[]>([])
   let tail = $state(true)
 
+  const matches = (regex: string, tags: string[] | undefined) => {
+      let actualRegex: RegExp | null = null
+      const isNegation = regex.startsWith("!")
+      const regexDesc = isNegation ? regex.substring(1) : regex
+      try {
+        actualRegex = new RegExp(regexDesc)
+      } catch (error) { }
+      if (!actualRegex)
+        return true
+      if (!tags)
+        return isNegation
+      if (isNegation)
+        return tags.every(tag => !tag.match(actualRegex))
+      return tags.some(tag => tag.match(actualRegex))
+    }
+
   let presentedLogs = $derived([ ...logs ].reverse().filter(log => {
 
     if (levelFilterMode === "strict") {
@@ -44,14 +60,18 @@
         return false
     }
 
-    if (tagFilter && !tagFilter.split(",").map(tag => tag.trim()).every(tag => log.tags && log.tags.some(t => t.match(new RegExp(tag)))))
+    if (tagFilter && !tagFilter
+      .split(",")
+      .map(regex => regex.trim())
+      .every(regex => matches(regex, log.tags)))
       return false
 
     return true
   }))
 
-  const fetchLogs = async (readLogsCount: number) => {
-    const response = await fetch(`/api/load?from=${readLogsCount}`).catch(() => {})
+  const fetchLogs = async (last?: number) => {
+    const url = last ? `/api/load?from=${last}` : `/api/load`
+    const response = await fetch(url).catch(() => {})
     if (!response)
       return
     const data = await response.json()
@@ -66,14 +86,6 @@
   
   const deleteLogs = async () => {
     const response = await fetch(`/api/delete`).catch(() => {})
-    if (!response)
-      return
-    const data = await response.json()
-    logs = [ ]
-  }
-  
-  const reset = async () => {
-    const response = await fetch(`/api/reset`).catch(() => {})
     if (!response)
       return
     const data = await response.json()
@@ -117,18 +129,26 @@
     if (selectedLogLevel !== level) {
       levelFilterMode = "upwards"
     }
+    else {
+      if (levelFilterMode === "upwards")
+        levelFilterMode = "strict"
+      else if (levelFilterMode === "strict")
+        levelFilterMode = "downwards"
+      else
+        levelFilterMode = "upwards"
+    }
     selectedLogLevel = level
   }
 
   onMount(() => {
-    fetchLogs(logs.length)
+    fetchLogs()
 
     const interval = setInterval(() => {
       if (tail)
-        fetchLogs(logs.length)
+        fetchLogs(logs[logs.length-1]?.time)
     }, 1000)
 
-    let pressedButtons: string[] = []
+    /* let pressedButtons: string[] = []
 
     const handle = (event: Event, buttons: string[], action: () => void) => {
       if (buttons.every(button => pressedButtons.includes(button))) {
@@ -170,15 +190,15 @@
     
     const keyupHandler = (event: KeyboardEvent) => {
       pressedButtons = pressedButtons.filter(k => k !== event.code)
-    }
+    } */
 
-    document.body.addEventListener('keydown', keydownHandler)
-    document.body.addEventListener('keyup', keyupHandler)
+    /* document.body.addEventListener('keydown', keydownHandler)
+    document.body.addEventListener('keyup', keyupHandler) */
 
     return () => {
       clearInterval(interval)
-      document.body.removeEventListener('keydown', keydownHandler)
-      document.body.removeEventListener('keyup', keyupHandler)
+      /* document.body.removeEventListener('keydown', keydownHandler)
+      document.body.removeEventListener('keyup', keyupHandler) */
     }
   })
 </script>
@@ -213,7 +233,7 @@
 
     <div class="flex gap-2">
       {#each logLevels as logLevel (logLevel)}
-      <button onclick={() => selectedLogLevel = logLevel} class={`btn ${getColor(logLevel)} ${getBorder(logLevel)}`}>{ logLevel }</button>
+      <button onclick={() => selectLevel(logLevel)} class={`btn ${getColor(logLevel)} ${getBorder(logLevel)}`}>{ logLevel }</button>
       {/each}
     </div>
   </div>
